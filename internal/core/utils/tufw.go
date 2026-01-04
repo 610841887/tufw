@@ -258,7 +258,7 @@ func FillCell(row string) *domain.CellValues {
 	toField := cols[1]
 	portField := cols[2]
 	if len(cols) == 4 {
-		toField = "Anywhere"
+		toField = "任意位置"
 		portField = cols[1]
 	}
 
@@ -298,7 +298,7 @@ func FillCell(row string) *domain.CellValues {
 	}
 
 	// --- From and iface ---
-	fromField := "Anywhere"
+	fromField := "任意位置"
 	if actionIdx >= 0 && actionIdx+1 < len(cols) {
 		fromField = cols[actionIdx+1]
 	}

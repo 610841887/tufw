@@ -24,13 +24,13 @@ func main() {
 	output, _ := cmd.Output()
 	i, _ := strconv.Atoi(string(output[:len(output)-1]))
 	if i != 0 {
-		log.Fatal("This program must be run as root! (sudo)")
+		log.Fatal("本程序必须以 root 权限运行！(sudo)")
 	}
 
 	cmd = exec.Command("ufw", "status")
 	_, err := cmd.Output()
 	if err != nil {
-		log.Fatal("Cannot find ufw. Is it installed?")
+		log.Fatal("找不到 ufw。请检查是否已安装。")
 	}
 
 	colorFlag := flag.String("color", "cyan", "Color value (red, green, blue)")
@@ -48,7 +48,7 @@ func main() {
 	case "cyan":
 		color = Cyan
 	default:
-		log.Fatalf("Invalid color: %s. Allowed values are red, green, blue.", *colorFlag)
+		log.Fatalf("无效颜色：%s。允许的值为 red, green, blue。", *colorFlag)
 	}
 
 	if *logFlag != "" {

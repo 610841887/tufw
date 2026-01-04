@@ -114,7 +114,7 @@ func (t *Tui) LoadTableData() ([]string, error) {
 func (t *Tui) CreateTable(rows []string) {
 	t.table.SetFixed(1, 1).SetBorderPadding(1, 0, 1, 1)
 
-	columns := []string{"#", "To", "Port", "Action", "From", "Comment"}
+	columns := []string{"#", "目标", "端口", "动作", "来源", "备注"}
 
 	for c := range columns {
 		t.table.SetCell(0, c, tview.NewTableCell(columns[c]).SetTextColor(t.color).SetAlign(tview.AlignCenter))
@@ -162,7 +162,7 @@ func (t *Tui) CreateTable(rows []string) {
 		}
 	}
 
-	t.table.SetBorder(true).SetTitle(" Status ")
+	t.table.SetBorder(true).SetTitle(" 状态 ")
 	t.table.SetBorders(false).SetSeparator(tview.Borders.Vertical)
 
 	t.table.SetFocusFunc(func() {
@@ -200,7 +200,7 @@ func (t *Tui) CreateModal(text string, confirm func(), cancel func(), finally fu
 }
 
 func (t *Tui) SearchForm() {
-	t.form.AddInputField("Regex", "", 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).AddButton("Search", func() {
+	t.form.AddInputField("正则表达式", "", 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).AddButton("搜索", func() {
 		needle := t.form.GetFormItem(0).(*tview.InputField).GetText()
 		data, _ := t.LoadSearchData(needle)
 
@@ -208,9 +208,9 @@ func (t *Tui) SearchForm() {
 			t.table.Clear()
 			t.CreateTable(data)
 		} else {
-			t.secondHelp.SetText(" No result.")
+			t.secondHelp.SetText(" 无结果。")
 		}
-	}).AddButton("Cancel", func() {
+	}).AddButton("取消", func() {
 		t.Reset()
 		t.ReloadTable()
 		t.app.SetFocus(t.menu)
@@ -229,7 +229,7 @@ func updateInterfaces(interfaces []string, selectedIn string) []string {
 }
 
 func (t *Tui) CreateForm() {
-	t.help.SetText("Use <Tab> and <Enter> keys to navigate through the form").SetBorderPadding(1, 0, 1, 1)
+	t.help.SetText("使用 <Tab> 和 <Enter> 键在表单中导航").SetBorderPadding(1, 0, 1, 1)
 	interfaces, _ := t.LoadInterfaces()
 
 	var ifaceInDropDown, ifaceOutDropDown *tview.DropDown
@@ -247,25 +247,25 @@ func (t *Tui) CreateForm() {
 	}
 
 	ifaceInDropDown = tview.NewDropDown().
-		SetLabel("Interface").
+		SetLabel("网络接口").
 		SetOptions(interfaces, func(text string, index int) {
 			updateInterfaceDropDowns("Interface", text)
 		})
 
 	ifaceOutDropDown = tview.NewDropDown().
-		SetLabel("Interface out").
+		SetLabel("出口接口").
 		SetOptions(interfaces, func(text string, index int) {
 			updateInterfaceDropDowns("Interface out", text)
 		})
 
-	t.form.AddInputField("To", "", 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).
-		AddInputField("Port", "", 20, utils.ValidatePort, nil).SetFieldTextColor(tcell.ColorWhite).
-		AddDropDown("Action *", []string{"ALLOW IN", "DENY IN", "REJECT IN", "LIMIT IN", "ALLOW OUT", "DENY OUT", "REJECT OUT", "LIMIT OUT", "ALLOW FWD", "DENY FWD"}, 0, func(action string, index int) {
+	t.form.AddInputField("目标 IP", "", 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).
+		AddInputField("端口", "", 20, utils.ValidatePort, nil).SetFieldTextColor(tcell.ColorWhite).
+		AddDropDown("动作 *", []string{"ALLOW IN", "DENY IN", "REJECT IN", "LIMIT IN", "ALLOW OUT", "DENY OUT", "REJECT OUT", "LIMIT OUT", "ALLOW FWD", "DENY FWD"}, 0, func(action string, index int) {
 			if action == "ALLOW FWD" || action == "DENY FWD" {
 				// Ensure the Interface out dropdown is in the form
 				found := false
 				for i := 0; i < t.form.GetFormItemCount(); i++ {
-					if t.form.GetFormItem(i).GetLabel() == "Interface out" {
+					if t.form.GetFormItem(i).GetLabel() == "出口接口" {
 						found = true
 						break
 					}
@@ -276,7 +276,7 @@ func (t *Tui) CreateForm() {
 			} else {
 				// Remove Interface out if it exists
 				for i := 0; i < t.form.GetFormItemCount(); i++ {
-					if t.form.GetFormItem(i).GetLabel() == "Interface out" {
+					if t.form.GetFormItem(i).GetLabel() == "出口接口" {
 						t.form.RemoveFormItem(i)
 						break
 					}
@@ -284,11 +284,11 @@ func (t *Tui) CreateForm() {
 			}
 		}).
 		AddFormItem(ifaceInDropDown).
-		AddDropDown("Protocol", []string{"", "tcp", "udp"}, 0, nil).
-		AddInputField("From", "", 20, nil, nil).
-		AddInputField("Comment", "", 40, nil, nil).
-		AddButton("Save", func() { t.CreateRule() }).
-		AddButton("Cancel", func() {
+		AddDropDown("协议", []string{"", "tcp", "udp"}, 0, nil).
+		AddInputField("来源 IP", "", 20, nil, nil).
+		AddInputField("备注", "", 40, nil, nil).
+		AddButton("保存", func() { t.CreateRule() }).
+		AddButton("取消", func() {
 			t.Reset()
 			t.app.SetFocus(t.menu)
 		}).
@@ -297,7 +297,7 @@ func (t *Tui) CreateForm() {
 		SetFieldBackgroundColor(t.color).
 		SetLabelColor(tcell.ColorWhite)
 
-	t.secondHelp.SetText("* Mandatory field\n\nPort, To and From fields respectively match any and Anywhere if left empty").SetTextColor(t.color).SetBorderPadding(0, 0, 1, 1)
+	t.secondHelp.SetText("* 必填项\n\n若留空，端口、目标和来源字段将分别匹配任意 (any) 和任意位置 (Anywhere)").SetTextColor(t.color).SetBorderPadding(0, 0, 1, 1)
 }
 
 func (t *Tui) ParseFormValues() domain.FormValues {
@@ -308,49 +308,49 @@ func (t *Tui) ParseFormValues() domain.FormValues {
 		label := strings.TrimSpace(item.GetLabel())
 
 		switch label {
-		case "To":
+		case "目标 IP":
 			if f, ok := item.(*tview.InputField); ok {
 				val := f.GetText()
 				fv.To = val
 			}
 
-		case "Port":
+		case "端口":
 			if f, ok := item.(*tview.InputField); ok {
 				val := f.GetText()
 				fv.Port = val
 			}
 
-		case "Action *":
+		case "动作 *":
 			if d, ok := item.(*tview.DropDown); ok {
 				_, val := d.GetCurrentOption()
 				fv.Action = strings.ToLower(strings.ReplaceAll(val, " ", "-"))
 			}
 
-		case "Interface":
+		case "网络接口":
 			if d, ok := item.(*tview.DropDown); ok {
 				_, val := d.GetCurrentOption()
 				fv.Interface = val
 			}
 
-		case "Interface out":
+		case "出口接口":
 			if d, ok := item.(*tview.DropDown); ok {
 				_, val := d.GetCurrentOption()
 				fv.InterfaceOut = val
 			}
 
-		case "Protocol":
+		case "协议":
 			if d, ok := item.(*tview.DropDown); ok {
 				_, val := d.GetCurrentOption()
 				fv.Protocol = val
 			}
 
-		case "From":
+		case "来源 IP":
 			if f, ok := item.(*tview.InputField); ok {
 				val := f.GetText()
 				fv.From = val
 			}
 
-		case "Comment":
+		case "备注":
 			if f, ok := item.(*tview.InputField); ok {
 				val := f.GetText()
 				fv.Comment = val
@@ -367,7 +367,7 @@ func (t *Tui) EditForm() {
 			t.app.SetFocus(t.table)
 			return
 		}
-		t.help.SetText("Use <Tab> and <Enter> keys to navigate through the form").SetBorderPadding(1, 0, 1, 1)
+		t.help.SetText("使用 <Tab> 和 <Enter> 键在表单中导航").SetBorderPadding(1, 0, 1, 1)
 		interfaces, _ := t.LoadInterfaces()
 
 		toCell := t.table.GetCell(row, 1).Text
@@ -428,12 +428,12 @@ func (t *Tui) EditForm() {
 		}
 
 		ifaceInDropDown = tview.NewDropDown().
-			SetLabel("Interface").
+			SetLabel("网络接口").
 			SetOptions(interfaces, nil).
 			SetCurrentOption(interfaceOptionIndex)
 
 		ifaceOutDropDown = tview.NewDropDown().
-			SetLabel("Interface out").
+			SetLabel("出口接口").
 			SetOptions(outInterfaces, nil).
 			SetCurrentOption(outInterfaceIndex)
 
@@ -449,7 +449,7 @@ func (t *Tui) EditForm() {
 		showOrRemoveInterfaceOut := func(action string) {
 			found := false
 			for i := 0; i < t.form.GetFormItemCount(); i++ {
-				if t.form.GetFormItem(i).GetLabel() == "Interface out" {
+				if t.form.GetFormItem(i).GetLabel() == "出口接口" {
 					found = true
 					break
 				}
@@ -461,7 +461,7 @@ func (t *Tui) EditForm() {
 				}
 			} else if found {
 				for i := 0; i < t.form.GetFormItemCount(); i++ {
-					if t.form.GetFormItem(i).GetLabel() == "Interface out" {
+					if t.form.GetFormItem(i).GetLabel() == "出口接口" {
 						t.form.RemoveFormItem(i)
 						break
 					}
@@ -469,24 +469,24 @@ func (t *Tui) EditForm() {
 			}
 		}
 
-		t.form.AddInputField("To", toValue, 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).
-			AddInputField("Port", portValue, 20, utils.ValidatePort, nil).SetFieldTextColor(tcell.ColorWhite).
-			AddDropDown("Action *", []string{"ALLOW IN", "DENY IN", "REJECT IN", "LIMIT IN", "ALLOW OUT", "DENY OUT", "REJECT OUT", "LIMIT OUT", "ALLOW FWD", "DENY FWD"}, actionOptionIndex, func(action string, index int) {
+		t.form.AddInputField("目标 IP", toValue, 20, nil, nil).SetFieldTextColor(tcell.ColorWhite).
+			AddInputField("端口", portValue, 20, utils.ValidatePort, nil).SetFieldTextColor(tcell.ColorWhite).
+			AddDropDown("动作 *", []string{"ALLOW IN", "DENY IN", "REJECT IN", "LIMIT IN", "ALLOW OUT", "DENY OUT", "REJECT OUT", "LIMIT OUT", "ALLOW FWD", "DENY FWD"}, actionOptionIndex, func(action string, index int) {
 				showOrRemoveInterfaceOut(action)
 			}).
-			AddDropDown("Interface", interfaces, interfaceOptionIndex, nil).
-			AddDropDown("Protocol", []string{"", "tcp", "udp"}, protocolOptionIndex, nil).
-			AddInputField("From", fromValue, 20, nil, nil).
-			AddInputField("Comment", comment, 40, nil, nil)
+			AddDropDown("网络接口", interfaces, interfaceOptionIndex, nil).
+			AddDropDown("协议", []string{"", "tcp", "udp"}, protocolOptionIndex, nil).
+			AddInputField("来源 IP", fromValue, 20, nil, nil).
+			AddInputField("备注", comment, 40, nil, nil)
 
-		t.form.AddButton("Save", func() {
+		t.form.AddButton("保存", func() {
 			editObject := t.ParseFormValues()
 			t.EditRule(row, editObject)
 			t.app.SetFocus(t.table)
 		}).
-			AddButton("Cancel", func() {
+			AddButton("取消", func() {
 				t.Reset()
-				t.help.SetText("Press <Esc> to go back to the menu selection").SetBorderPadding(1, 0, 1, 0)
+				t.help.SetText("按 <Esc> 键返回菜单").SetBorderPadding(1, 0, 1, 0)
 				t.app.SetFocus(t.table)
 			}).
 			SetButtonTextColor(tcell.ColorWhite).
@@ -494,7 +494,7 @@ func (t *Tui) EditForm() {
 			SetFieldBackgroundColor(t.color).
 			SetLabelColor(tcell.ColorWhite)
 
-		t.secondHelp.SetText("* Mandatory field\n\nPort, To and From fields respectively match any and Anywhere if left empty").
+		t.secondHelp.SetText("* 必填项\n\n若留空，端口、目标和来源字段将分别匹配任意 (any) 和任意位置 (Anywhere)").
 			SetTextColor(t.color).
 			SetBorderPadding(0, 0, 1, 1)
 
@@ -590,17 +590,17 @@ func (t *Tui) EditRule(position int, object domain.FormValues, rows ...int) *str
 func (t *Tui) CreateRule() {
 
 	var ninterfaceOut string
-	if item, ok := t.form.GetFormItemByLabel("Interface out").(*tview.DropDown); ok {
+	if item, ok := t.form.GetFormItemByLabel("出口接口").(*tview.DropDown); ok {
 		_, ninterfaceOut = item.GetCurrentOption()
 	}
 
-	to := t.form.GetFormItemByLabel("To").(*tview.InputField).GetText()
-	port := t.form.GetFormItemByLabel("Port").(*tview.InputField).GetText()
-	_, ninterface := t.form.GetFormItemByLabel("Interface").(*tview.DropDown).GetCurrentOption()
-	_, proto := t.form.GetFormItemByLabel("Protocol").(*tview.DropDown).GetCurrentOption()
-	_, action := t.form.GetFormItemByLabel("Action *").(*tview.DropDown).GetCurrentOption()
-	from := t.form.GetFormItemByLabel("From").(*tview.InputField).GetText()
-	comment := t.form.GetFormItemByLabel("Comment").(*tview.InputField).GetText()
+	to := t.form.GetFormItemByLabel("目标 IP").(*tview.InputField).GetText()
+	port := t.form.GetFormItemByLabel("端口").(*tview.InputField).GetText()
+	_, ninterface := t.form.GetFormItemByLabel("网络接口").(*tview.DropDown).GetCurrentOption()
+	_, proto := t.form.GetFormItemByLabel("协议").(*tview.DropDown).GetCurrentOption()
+	_, action := t.form.GetFormItemByLabel("动作 *").(*tview.DropDown).GetCurrentOption()
+	from := t.form.GetFormItemByLabel("来源 IP").(*tview.InputField).GetText()
+	comment := t.form.GetFormItemByLabel("备注").(*tview.InputField).GetText()
 
 	// Guard clauses: no-op if everything is empty
 	if port == "" && proto == "" && ninterface == "" && to == "" && from == "" {
@@ -677,7 +677,7 @@ func (t *Tui) RemoveRule() {
 			t.app.SetFocus(t.table)
 			return
 		}
-		t.CreateModal("Are you sure you want to remove this rule?",
+		t.CreateModal("您确定要删除这条规则吗？",
 			func() {
 				shellout(fmt.Sprintf("ufw --force delete %d", row))
 			},
@@ -696,27 +696,27 @@ func (t *Tui) RemoveRule() {
 func (t *Tui) CreateMenu() {
 	menuList := tview.NewList()
 	menuList.
-		AddItem("Search a rule", "", '/', func() {
+		AddItem("搜索规则", "", '/', func() {
 			t.SearchForm()
 			t.app.SetFocus(t.form)
-			t.help.SetText("Press <Esc> to go back to the menu selection").SetBorderPadding(1, 0, 1, 0)
+			t.help.SetText("按 <Esc> 键返回菜单").SetBorderPadding(1, 0, 1, 0)
 		}).
-		AddItem("Add a rule", "", 'a', func() {
+		AddItem("添加规则", "", 'a', func() {
 			t.CreateForm()
 			t.app.SetFocus(t.form)
 		}).
-		AddItem("Edit a rule", "", 'e', func() {
+		AddItem("编辑规则", "", 'e', func() {
 			t.EditForm()
 			t.app.SetFocus(t.table)
-			t.help.SetText("Press <Esc> to go back to the menu selection").SetBorderPadding(1, 0, 1, 0)
+			t.help.SetText("按 <Esc> 键返回菜单").SetBorderPadding(1, 0, 1, 0)
 		}).
-		AddItem("Delete a rule", "", 'd', func() {
+		AddItem("删除规则", "", 'd', func() {
 			t.RemoveRule()
 			t.app.SetFocus(t.table)
-			t.help.SetText("Press <Esc> to go back to the menu selection").SetBorderPadding(1, 0, 1, 0)
+			t.help.SetText("按 <Esc> 键返回菜单").SetBorderPadding(1, 0, 1, 0)
 		}).
-		AddItem("Disable ufw", "", 's', func() {
-			t.CreateModal("Are you sure you want to disable ufw?",
+		AddItem("禁用 ufw", "", 's', func() {
+			t.CreateModal("您确定要禁用 ufw 吗？",
 				func() {
 					shellout("ufw --force disable")
 					t.app.Stop()
@@ -730,8 +730,8 @@ func (t *Tui) CreateMenu() {
 				},
 			)
 		}).
-		AddItem("Reset rules", "", 'r', func() {
-			t.CreateModal("Are you sure you want to reset all rules?",
+		AddItem("重置规则", "", 'r', func() {
+			t.CreateModal("您确定要重置所有规则吗？",
 				func() {
 					shellout("ufw --force reset")
 					t.app.Stop()
@@ -745,10 +745,10 @@ func (t *Tui) CreateMenu() {
 				},
 			)
 		}).
-		AddItem("Exit", "", 'q', func() { t.app.Stop() })
+		AddItem("退出", "", 'q', func() { t.app.Stop() })
 	menuList.SetShortcutColor(t.color).SetBorderPadding(1, 0, 1, 1)
 	t.menu.AddItem(menuList, 0, 1, true)
-	t.menu.SetBorder(true).SetTitle(" Menu ")
+	t.menu.SetBorder(true).SetTitle(" 菜单 ")
 }
 
 func (t *Tui) Reset() {
@@ -786,7 +786,7 @@ func (t *Tui) Build(data []string) {
 
 	if len(data) <= 1 {
 		t.pages.HidePage("base")
-		t.CreateModal("ufw is disabled.\nDo you want to enable it?",
+		t.CreateModal("ufw 已禁用。\n您想要启用它吗？",
 			func() {
 				shellout("ufw --force enable")
 			},
