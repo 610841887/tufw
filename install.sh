@@ -17,6 +17,40 @@ if [ "$OS" != "Linux" ]; then
     exit 1
 fi
 
+# 检查并安装依赖 (ufw)
+check_install_ufw() {
+    if ! command -v ufw &> /dev/null; then
+        echo -e "${BLUE}未检测到 ufw，正在尝试安装...${NC}"
+        if [ "$(id -u)" -ne 0 ]; then
+            echo -e "${RED}错误：安装依赖需要 root 权限，请使用 sudo 运行此脚本。${NC}"
+            exit 1
+        fi
+
+        if command -v apt-get &> /dev/null; then
+            apt-get update && apt-get install -y ufw
+        elif command -v pacman &> /dev/null; then
+            pacman -Sy --noconfirm ufw
+        elif command -v dnf &> /dev/null; then
+            dnf install -y ufw
+        elif command -v yum &> /dev/null; then
+            yum install -y ufw
+        else
+            echo -e "${RED}警告：无法自动安装 ufw。请手动安装后重试。${NC}"
+            exit 1
+        fi
+
+        if ! command -v ufw &> /dev/null; then
+             echo -e "${RED}安装 ufw 失败。${NC}"
+             exit 1
+        fi
+        echo -e "${GREEN}ufw 安装成功。${NC}"
+    else
+        echo -e "${GREEN}检测到 ufw 已安装。${NC}"
+    fi
+}
+
+check_install_ufw
+
 # 检测架构
 ARCH="$(uname -m)"
 case $ARCH in
