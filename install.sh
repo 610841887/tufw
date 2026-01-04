@@ -38,7 +38,7 @@ esac
 echo -e "${GREEN}检测到系统：Linux ($ARCH)${NC}"
 
 # 获取最新版本号
-REPO="peltho/tufw" # 请根据实际情况修改仓库名
+REPO="610841887/tufw" # 请根据实际情况修改仓库名
 LATEST_RELEASE_URL="https://api.github.com/repos/$REPO/releases/latest"
 VERSION=$(curl -s $LATEST_RELEASE_URL | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 

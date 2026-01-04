@@ -149,6 +149,7 @@ func FormatUfwRule(row string) string {
 	formatted := fmt.Sprintf("%s %s %s %s %s%s",
 		index, strings.TrimSpace(toPart), port, actionFull, strings.TrimSpace(fromPart), comment)
 	formatted = strings.TrimSpace(regexp.MustCompile(`\s+`).ReplaceAllString(formatted, " "))
+	formatted = strings.ReplaceAll(formatted, "Anywhere", "任意位置")
 	return formatted
 }
 

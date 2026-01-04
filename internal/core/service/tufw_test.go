@@ -28,7 +28,7 @@ var tests = []struct {
 			Comment:   "SSH rule",
 		},
 		row:          "[ 1] 192.168.0.1 22/tcp         ALLOW IN    Anywhere # SSH rule",
-		formattedRow: "[1] 192.168.0.1/tcp 22 ALLOW-IN Anywhere # SSH rule",
+		formattedRow: "[1] 192.168.0.1/tcp 22 ALLOW-IN 任意位置 # SSH rule",
 		expectedCmd:  "ufw allow in from any to 192.168.0.1 proto tcp port 22 comment 'SSH rule'",
 	},
 	{
@@ -43,7 +43,7 @@ var tests = []struct {
 			Comment:   "",
 		},
 		row:          "[ 1] 192.168.0.1 80         ALLOW IN    Anywhere",
-		formattedRow: "[1] 192.168.0.1 80 ALLOW-IN Anywhere",
+		formattedRow: "[1] 192.168.0.1 80 ALLOW-IN 任意位置",
 		expectedCmd:  "ufw allow in from any to 192.168.0.1 port 80",
 	},
 	{
@@ -59,7 +59,7 @@ var tests = []struct {
 			Comment:      "",
 		},
 		row:          "[ 1] 192.168.1.100 80/tcp DENY FWD Anywhere on eth0 out on eth1",
-		formattedRow: "[1] 192.168.1.100/tcp_on_eth1 80 DENY-FWD Anywhere_on_eth0",
+		formattedRow: "[1] 192.168.1.100/tcp_on_eth1 80 DENY-FWD 任意位置_on_eth0",
 		expectedCmd:  "ufw route deny in on eth0 out on eth1 from any to 192.168.1.100 proto tcp port 80",
 	},
 	{
@@ -74,7 +74,7 @@ var tests = []struct {
 			Comment:   "Web",
 		},
 		row:          "[ 1] 192.168.0.2 80 ALLOW IN Anywhere                       # Web",
-		formattedRow: "[1] 192.168.0.2 80 ALLOW-IN Anywhere # Web",
+		formattedRow: "[1] 192.168.0.2 80 ALLOW-IN 任意位置 # Web",
 		expectedCmd:  "ufw allow in from any to 192.168.0.2 port 80 comment 'Web'",
 	},
 	{
@@ -88,7 +88,7 @@ var tests = []struct {
 			From:      "",
 		},
 		row:          "[ 1] 10.0.0.0/24 - udp DENY IN Anywhere",
-		formattedRow: "[1] 10.0.0.0/24/udp - DENY-IN Anywhere",
+		formattedRow: "[1] 10.0.0.0/24/udp - DENY-IN 任意位置",
 		expectedCmd:  "ufw deny in from any to 10.0.0.0/24 proto udp",
 	},
 	{
@@ -102,7 +102,7 @@ var tests = []struct {
 			From:      "10.0.0.0/24",
 		},
 		row:          "[ 1] Anywhere - udp ALLOW IN 10.0.0.0/24",
-		formattedRow: "[1] Anywhere/udp - ALLOW-IN 10.0.0.0/24",
+		formattedRow: "[1] 任意位置/udp - ALLOW-IN 10.0.0.0/24",
 		expectedCmd:  "ufw allow in from 10.0.0.0/24 to any proto udp",
 	},
 	{
@@ -164,7 +164,7 @@ var tests = []struct {
 			Comment:   "SMTP inbound",
 		},
 		row:          "[ 1] Anywhere 25/tcp ALLOW IN 192.168.10.0/24 # SMTP inbound",
-		formattedRow: "[1] Anywhere/tcp 25 ALLOW-IN 192.168.10.0/24 # SMTP inbound",
+		formattedRow: "[1] 任意位置/tcp 25 ALLOW-IN 192.168.10.0/24 # SMTP inbound",
 		expectedCmd:  "ufw allow in from 192.168.10.0/24 to any proto tcp port 25 comment 'SMTP inbound'",
 	},
 	{
@@ -179,7 +179,7 @@ var tests = []struct {
 			Comment:   "Block Google DNS",
 		},
 		row:          "[ 1] 8.8.8.8 53/udp DENY OUT Anywhere # Block Google DNS",
-		formattedRow: "[1] 8.8.8.8/udp 53 DENY-OUT Anywhere # Block Google DNS",
+		formattedRow: "[1] 8.8.8.8/udp 53 DENY-OUT 任意位置 # Block Google DNS",
 		expectedCmd:  "ufw deny out from any to 8.8.8.8 proto udp port 53 comment 'Block Google DNS'",
 	},
 	{
@@ -194,7 +194,7 @@ var tests = []struct {
 			Comment:   "SSH v6",
 		},
 		row:          "[ 1] ::1 22/tcp ALLOW IN Anywhere (v6) # SSH v6",
-		formattedRow: "[1] ::1/tcp 22 ALLOW-IN Anywhere # SSH v6",
+		formattedRow: "[1] ::1/tcp 22 ALLOW-IN 任意位置 # SSH v6",
 		expectedCmd:  "ufw allow in from any to ::1 proto tcp port 22 comment 'SSH v6'",
 	},
 	{
@@ -210,7 +210,7 @@ var tests = []struct {
 			Comment:      "",
 		},
 		row:          "[ 1] 3.3.3.3 on lo DENY FWD Anywhere on enp0s1",
-		formattedRow: "[1] 3.3.3.3_on_lo - DENY-FWD Anywhere_on_enp0s1",
+		formattedRow: "[1] 3.3.3.3_on_lo - DENY-FWD 任意位置_on_enp0s1",
 		expectedCmd:  "ufw route deny in on enp0s1 out on lo from any to 3.3.3.3",
 	},
 	{
@@ -225,7 +225,7 @@ var tests = []struct {
 			Comment:   "",
 		},
 		row:          "[ 1] Anywhere 22/tcp ALLOW IN Anywhere on eth0",
-		formattedRow: "[1] Anywhere/tcp 22 ALLOW-IN Anywhere_on_eth0",
+		formattedRow: "[1] 任意位置/tcp 22 ALLOW-IN 任意位置_on_eth0",
 		expectedCmd:  "ufw allow in on eth0 from any to any proto tcp port 22",
 	},
 	{
@@ -240,7 +240,7 @@ var tests = []struct {
 			Comment:   "",
 		},
 		row:          "[ 1] 22                         ALLOW IN    Anywhere",
-		formattedRow: "[1] 22 ALLOW-IN Anywhere",
+		formattedRow: "[1] 22 ALLOW-IN 任意位置",
 		expectedCmd:  "ufw allow in from any to any port 22",
 	},
 }
@@ -248,21 +248,21 @@ var tests = []struct {
 func populateForm(f *tview.Form, v domain.FormValues) {
 	f.Clear(true) // remove previous fields if any
 
-	f.AddInputField("To", v.To, 10, nil, nil)
+	f.AddInputField("目标 IP", v.To, 10, nil, nil)
 
-	f.AddInputField("Port", v.Port, 10, nil, nil)
+	f.AddInputField("端口", v.Port, 10, nil, nil)
 
-	f.AddDropDown("Interface", []string{v.Interface}, 0, nil)
+	f.AddDropDown("网络接口", []string{v.Interface}, 0, nil)
 
-	f.AddDropDown("Interface out", []string{v.InterfaceOut}, 0, nil)
+	f.AddDropDown("出口接口", []string{v.InterfaceOut}, 0, nil)
 
-	f.AddDropDown("Protocol", []string{v.Protocol}, 0, nil)
+	f.AddDropDown("协议", []string{v.Protocol}, 0, nil)
 
-	f.AddDropDown("Action *", []string{v.Action}, 0, nil)
+	f.AddDropDown("动作 *", []string{v.Action}, 0, nil)
 
-	f.AddInputField("From", v.From, 10, nil, nil)
+	f.AddInputField("来源 IP", v.From, 10, nil, nil)
 
-	f.AddInputField("Comment", v.Comment, 10, nil, nil)
+	f.AddInputField("备注", v.Comment, 10, nil, nil)
 }
 
 func TestCreateRule_BuildsCorrectCommands(t *testing.T) {
