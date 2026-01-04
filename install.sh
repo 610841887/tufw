@@ -91,7 +91,20 @@ echo -e "${GREEN}最新版本：$VERSION${NC}"
 
 CLEAN_VERSION="${VERSION#v}" # 去掉 v 前缀
 FILENAME="tufw_${CLEAN_VERSION}_linux_${ARCH}.tar.gz"
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
+BASE_URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
+
+# 询问是否使用加速
+read -p "是否使用镜像加速下载 (mirror.ghproxy.com)? [Y/n] " choice
+case "$choice" in
+  y|Y|"" )
+    echo -e "${BLUE}已启用镜像加速。${NC}"
+    DOWNLOAD_URL="https://mirror.ghproxy.com/$BASE_URL"
+    ;;
+  * )
+    echo -e "${BLUE}使用官方源下载。${NC}"
+    DOWNLOAD_URL="$BASE_URL"
+    ;;
+esac
 
 echo -e "${BLUE}正在下载 $FILENAME...${NC}"
 curl -L -o "$FILENAME" "$DOWNLOAD_URL"
